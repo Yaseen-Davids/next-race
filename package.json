@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "client": "cd ui && npm run dev",
+    "server": "cd api && npm run start-dev",
+    "start": "npm run dev",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"red,blue\" -p \"[{name}]\" \"npm run server\" \"npm run client\" --kill-others-on-fail"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "package": "^1.0.1"
+  }
+}
