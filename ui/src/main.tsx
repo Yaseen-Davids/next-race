@@ -9,6 +9,8 @@ import { UserProvider } from "./contexts/UserContext.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { Login } from "./pages/user/login.tsx";
 import { Register } from "./pages/user/register.tsx";
+import { CarEdit } from "./pages/car/edit.tsx";
+import { Toaster } from "@/components/ui/sonner";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +31,10 @@ const router = createBrowserRouter([
         path: "/",
         element: <App />,
       },
+      {
+        path: "/car/:id?",
+        element: <CarEdit />,
+      },
     ],
   },
 ]);
@@ -38,6 +44,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <RouterProvider router={router} />
+        <Toaster />
       </UserProvider>
     </QueryClientProvider>
   </React.StrictMode>

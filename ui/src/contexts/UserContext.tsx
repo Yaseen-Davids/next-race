@@ -3,7 +3,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
 type User = {
-  id?: number;
+  id?: string;
   username: string;
   email: string;
   password: string;

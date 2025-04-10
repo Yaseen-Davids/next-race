@@ -13,6 +13,7 @@ import { createClient } from "redis";
 
 import indexRouter from "./routes/index";
 import userRouter from "./routes/user";
+import carRouter from "./routes/car";
 
 import { passport } from "./passport/index";
 import { secrets } from "./config/secrets";
@@ -51,6 +52,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api", indexRouter);
 app.use("/api", userRouter);
+app.use("/api/cars", carRouter);
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
