@@ -42,7 +42,7 @@ const upsert =
         .returning("id");
       id = res[0].id;
     } else {
-      await query("cars")
+      await query(table)
         .update({ ...data })
         .where("id", id);
     }
