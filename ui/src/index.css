@@ -67,3 +67,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+.rbc-calendar {
+  /* * {
+    border-top-color: #474747 !important;
+    border-left-color: #474747 !important;
+    border-right-color: #474747 !important;
+    border-bottom-color: #474747 !important;
+  } */
+
+  .rbc-month-view {
+    .rbc-month-row {
+      
+      /* .rbc-off-range-bg {
+        background-color: #474747;
+      } */
+      
+      /* .rbc-today {
+        background-color: #474747;
+      } */
+      
+      .rbc-row-content {
+        .rbc-row {
+          .rbc-event {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,6 +11,7 @@ import { Login } from "./pages/user/login.tsx";
 import { Register } from "./pages/user/register.tsx";
 import { CarEdit } from "./pages/car/edit.tsx";
 import { Toaster } from "@/components/ui/sonner";
+// import { ThemeProvider } from "./components/theme-provider.tsx";
 
 const queryClient = new QueryClient();
 
@@ -43,8 +44,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <UserProvider>
+        {/* <ThemeProvider defaultTheme="dark" storageKey="app-theme"> */}
         <RouterProvider router={router} />
         <Toaster />
+        {/* </ThemeProvider> */}
       </UserProvider>
     </QueryClientProvider>
   </React.StrictMode>

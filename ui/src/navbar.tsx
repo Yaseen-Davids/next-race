@@ -21,9 +21,15 @@ export const Navbar: FC<NavbarProps> = ({}) => {
       <Link to="/" className="font-bold text-white text-xl">
         [INFIN8]'s Garage
       </Link>
-      <Button className="border text-white" variant={"ghost"} onClick={logout}>
-        Log out
-      </Button>
+      <div className="space-x-8">
+        <Button
+          className="border text-white"
+          variant={"ghost"}
+          onClick={logout}
+        >
+          Log out
+        </Button>
+      </div>
     </div>
   );
 };

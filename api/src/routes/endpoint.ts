@@ -95,7 +95,7 @@ export const endpoint = <T>(
 ) => {
   const endpoint = express.Router();
   endpoint.get("/", maybe(validators.all), indexEndpoint(all));
-  endpoint.get("/:id", maybe(validators.findBy), showEndpoint(findBy));
+  endpoint.get("/findBy/:id", maybe(validators.findBy), showEndpoint(findBy));
   endpoint.put("/:id", maybe(validators.update), updateEndpoint(update));
   endpoint.post("/", maybe(validators.create), createEndpoint(create));
   endpoint.delete("/:id", maybe(validators.remove), removeEndpoint(remove));

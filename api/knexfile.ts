@@ -4,11 +4,11 @@ const config = {
   development: {
     client: "postgresql",
     connection: {
-      host: secrets.postgres.host,
-      user: secrets.postgres.user,
-      database: secrets.postgres.database,
-      password: secrets.postgres.password,
-      port: secrets.postgres.port,
+      host: "localhost",
+      user: "yaseendavids",
+      database: "nextrace",
+      password: "loops",
+      port: "5432",
     },
     pool: {
       min: 2,

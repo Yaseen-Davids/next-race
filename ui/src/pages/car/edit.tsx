@@ -19,7 +19,7 @@ export const CarEdit: FC<Props> = () => {
 
   const { data, isFetching } = useQuery<Car>(
     ["fetch-car", params.id],
-    () => axios.get(`/api/cars/${params.id}`).then((res) => res.data),
+    () => axios.get(`/api/cars/findBy/${params.id}`).then((res) => res.data),
     {
       enabled: !!params.id,
     }

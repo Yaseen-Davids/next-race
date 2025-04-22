@@ -27,10 +27,7 @@ export const DateField: FC<DateFieldProps> = ({
 }) => {
   return (
     <div>
-      <label
-        htmlFor={field}
-        className="block text-sm/6 font-medium text-gray-900"
-      >
+      <label htmlFor={field} className="block text-sm/6 font-medium">
         {label}
       </label>
       <div className="mt-1">
@@ -60,10 +57,10 @@ export const DateField: FC<DateFieldProps> = ({
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
+                    initialFocus
                     mode="single"
                     selected={input.value}
                     onSelect={input.onChange}
-                    initialFocus
                   />
                 </PopoverContent>
               </Popover>

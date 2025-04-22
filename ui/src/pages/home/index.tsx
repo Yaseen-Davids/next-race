@@ -9,10 +9,10 @@ import {
   Event,
 } from "react-big-calendar";
 import { Button } from "@/components/ui/button";
-
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { CreateEventDialog } from "./CreateEventDialog";
 import { useQuery } from "@tanstack/react-query";
+import axios, { AxiosResponse } from "axios";
 
 const locales = {
   "en-US": enUS,
@@ -26,48 +26,91 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
+const statusColor: { [status: string]: string } = {
+  new: "bg-green-100 text-green-800",
+  recorded: "bg-orange-100 text-orange-600",
+  edited: "bg-yellow-100 text-yellow-600",
+  done: "bg-gray-200 text-gray-400",
+};
+
+interface UserEvent {
+  event_id: string;
+  event_date: string;
+  event_status: string;
+  race_title: string;
+}
+
 type HomeProps = {};
 
 export const Home: FC<HomeProps> = ({}) => {
-  // TODO
-  // const {} = useQuery({
-  //   queryFn: () => axios.get("/api/events/by-user")
-  // });
-
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [calendarDate, setCalendarDate] = useState<Date>();
+  const [selectedEventId, setSelectedEventId] = useState<string>();
 
   const defaultDate = useMemo(() => new Date(), []);
 
+  const { data } = useQuery<AxiosResponse<UserEvent[]>>({
+    queryKey: ["events-by-user", calendarDate],
+    queryFn: () =>
+      axios.get(
+        `/api/events/byUser?inputDate=${format(
+          calendarDate || new Date(),
+          "yyyy-MM-dd"
+        )}`
+      ),
+  });
+
+  const events = useMemo(
+    () =>
+      (data?.data || []).map((d) => ({
+        id: d.event_id,
+        name: d.race_title,
+        start: new Date(d.event_date),
+        end: new Date(d.event_date),
+        status: d.event_status,
+      })),
+    [data?.data]
+  );
+
   return (
     <div className="p-8 h-[700px]">
-      {selectedDate && (
+      {(selectedDate || selectedEventId) && (
         <CreateEventDialog
           date={selectedDate}
-          handleClose={() => setSelectedDate(undefined)}
+          eventId={selectedEventId}
+          handleClose={() => {
+            setSelectedDate(undefined);
+            setSelectedEventId(undefined);
+          }}
         />
       )}
       <Calendar
         selectable
-        events={[]}
+        events={events}
         views={["month"]}
         endAccessor="end"
         defaultView="month"
         startAccessor="start"
-        // showAllEvents={false}
         localizer={localizer}
         defaultDate={defaultDate}
-        // onNavigate={(newDate) => setSelectedDate(newDate)}
+        onNavigate={(newDate) => setCalendarDate(newDate)}
         onSelectSlot={(slot) => setSelectedDate(slot.start)}
-        // onSelectEvent={(slot) => {
-        //   console.log("🚀 ~ App ~ slot:", slot);
-        // }}
-        // style={{ height: "100%" }}
+        onSelectEvent={(slot) => setSelectedEventId(slot.id)}
         components={{
           showMore: () => <></>,
-          // toolbar: CustomToolbar,
           month: {
-            event: (ev: EventProps<Event & { name: string }>) => {
-              return <p className="text-xs">{ev.event.name}</p>;
+            event: (
+              ev: EventProps<Event & { name: string; status: string }>
+            ) => {
+              return (
+                <p
+                  className={`text-xs text-center px-2 py-1 rounded whitespace-nowrap ${
+                    statusColor[ev.event.status]
+                  }`}
+                >
+                  {ev.event.name}
+                </p>
+              );
             },
           },
         }}

@@ -1,12 +1,19 @@
 import { FC } from "react";
 import { Field, useForm } from "react-final-form";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
-import Select from "react-select";
+import { LoadingSpinner } from "../LoadingSpinner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 const validate = (value: any) =>
   value && value != "" ? undefined : "Required";
 
-type TextComboProps = {
+type SelectFieldProps = {
   label: string;
   field: string;
   isFetching?: boolean;
@@ -15,7 +22,7 @@ type TextComboProps = {
   data: { value: string; label: string }[];
 };
 
-export const TextCombo: FC<TextComboProps> = ({
+export const SelectField: FC<SelectFieldProps> = ({
   label,
   field,
   data,
@@ -34,10 +41,7 @@ export const TextCombo: FC<TextComboProps> = ({
 
   return (
     <div>
-      <label
-        htmlFor={field}
-        className="block text-sm/6 font-medium text-gray-900"
-      >
+      <label htmlFor={field} className="block text-sm/6 font-medium">
         {label}
       </label>
       <div className="mt-1">
@@ -49,13 +53,41 @@ export const TextCombo: FC<TextComboProps> = ({
               <>
                 <Select
                   {...input}
-                  options={data}
-                  isMulti={multiple}
-                  isLoading={isFetching}
-                  required={required}
-                  getOptionValue={(option) => option.value}
-                  getOptionLabel={(option) => option.label}
-                />
+                  onValueChange={(value) => {
+                    if (value == "") return;
+
+                    if (multiple) {
+                      const selected = form.getState().values[field] || [];
+                      if (!selected.some((s: string) => s == value)) {
+                        form.change(field, [...selected, value]);
+                      }
+                    } else {
+                      form.change(field, value);
+                    }
+                  }}
+                >
+                  <SelectTrigger
+                    className={`relative w-full ${
+                      meta.error && meta.touched ? "border-red-600" : ""
+                    }`}
+                  >
+                    <SelectValue placeholder="" />
+                    {isFetching && (
+                      <LoadingSpinner
+                        isButton
+                        size={"xs"}
+                        className="absolute right-1 top-1"
+                      />
+                    )}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {data.map((row, i) => (
+                      <SelectItem key={i} value={row.value}>
+                        {row.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {meta.error && meta.touched && (
                   <span className="text-red-600 text-xs">{meta.error}</span>
                 )}
