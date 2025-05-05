@@ -74,6 +74,15 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
     return { ...rest, car1, car2 };
   }, [eventData, eventId]);
 
+  const handleRemoveEvent = async (eventId: string) => {
+    await removeEvent(eventId);
+    queryClient.invalidateQueries({
+      queryKey: ["events-by-user"],
+    });
+    toast.success("Event successfully removed!");
+    handleClose();
+  };
+
   return (
     <Dialog open onOpenChange={() => handleClose()}>
       <DialogContent className="sm:max-w-[425px]">
@@ -117,14 +126,7 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
                 <Button
                   variant={"destructive"}
                   className="w-full bg-red-100 hover:bg-red-200 text-red-600"
-                  onClick={() => {
-                    removeEvent(eventId);
-                    queryClient.invalidateQueries({
-                      queryKey: ["events-by-user"],
-                    });
-                    toast.success("Event successfully removed!");
-                    handleClose();
-                  }}
+                  onClick={() => handleRemoveEvent(eventId)}
                 >
                   Delete
                 </Button>

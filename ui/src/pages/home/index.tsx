@@ -11,8 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { CreateEventDialog } from "./CreateEventDialog";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import { toast } from "sonner";
+
+const DnDCalendar = withDragAndDrop(Calendar);
 
 const locales = {
   "en-US": enUS,
@@ -43,6 +47,8 @@ interface UserEvent {
 type HomeProps = {};
 
 export const Home: FC<HomeProps> = ({}) => {
+  const queryClient = useQueryClient();
+
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [calendarDate, setCalendarDate] = useState<Date>();
   const [selectedEventId, setSelectedEventId] = useState<string>();
@@ -72,6 +78,25 @@ export const Home: FC<HomeProps> = ({}) => {
     [data?.data]
   );
 
+  const { mutateAsync: upsertEvent } = useMutation({
+    mutationKey: ["upsert-event"] as string[],
+    mutationFn: async (values: any) => {
+      console.log("🚀 ~ values:", values);
+      return await axios.put(`/api/events/${values.eventId}`, values.values);
+    },
+  });
+
+  const handleDrop = async (eventId: string, newDate: Date) => {
+    await upsertEvent({
+      eventId,
+      values: { date: format(newDate, "yyyy-MM-dd") },
+    });
+    queryClient.invalidateQueries({
+      queryKey: ["events-by-user"],
+    });
+    toast.success("Event successfully moved!");
+  };
+
   return (
     <div className="p-8 h-[700px]">
       {(selectedDate || selectedEventId) && (
@@ -84,18 +109,18 @@ export const Home: FC<HomeProps> = ({}) => {
           }}
         />
       )}
-      <Calendar
+      <DnDCalendar
         selectable
         events={events}
         views={["month"]}
-        endAccessor="end"
         defaultView="month"
-        startAccessor="start"
         localizer={localizer}
         defaultDate={defaultDate}
+        draggableAccessor={(event) => event.status !== "done"}
         onNavigate={(newDate) => setCalendarDate(newDate)}
         onSelectSlot={(slot) => setSelectedDate(slot.start)}
         onSelectEvent={(slot) => setSelectedEventId(slot.id)}
+        onEventDrop={(props) => handleDrop(props.event.id, props.start)}
         components={{
           showMore: () => <></>,
           month: {
@@ -104,7 +129,8 @@ export const Home: FC<HomeProps> = ({}) => {
             ) => {
               return (
                 <p
-                  className={`text-xs text-center px-2 py-1 rounded whitespace-nowrap ${
+                  title={ev.event.name}
+                  className={`text-xs text-center px-2 py-1 rounded ${
                     statusColor[ev.event.status]
                   }`}
                 >

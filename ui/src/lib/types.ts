@@ -6,3 +6,11 @@ export type Car = {
   created_at?: Date;
   updated_at?: Date;
 };
+
+export type EventType = {
+  id: string;
+  name: string;
+  start: Date;
+  end: Date;
+  status: string;
+};

@@ -67,11 +67,11 @@ router.get(
         FROM events e
         JOIN races r ON r.event_id = e.id
         JOIN cars c ON c.id = r.car_id
-        WHERE date_trunc('month', e.date) = date_trunc('month', (?::timestamp))
+        WHERE e.date BETWEEN (?::timestamp - INTERVAL '1 month') AND (?::timestamp + INTERVAL '1 month')
         GROUP BY e.id, e.date, e.status
         ORDER BY e.date ASC;
         `,
-        [inputDate]
+        [inputDate, inputDate]
       );
       return res.json(data.rows);
     } catch (error) {

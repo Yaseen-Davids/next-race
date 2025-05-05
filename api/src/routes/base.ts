@@ -21,7 +21,8 @@ const create =
 const update =
   <T>(table: string) =>
   async (id: string, data: Partial<T>): Promise<string> => {
-    return await query(table).update(data, "id").where("id", id).first();
+    const [res] = await query(table).update(data, "id").where("id", id);
+    return res.id;
   };
 
 const remove =
