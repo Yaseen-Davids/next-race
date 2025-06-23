@@ -209,6 +209,7 @@ const FormDetail: FC<FormDetailProps> = ({
         label="Status"
         data={[
           { label: "New", value: "new" },
+          { label: "Raced", value: "raced" },
           { label: "Recorded", value: "recorded" },
           { label: "Edited", value: "edited" },
           { label: "Done", value: "done" },

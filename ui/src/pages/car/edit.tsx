@@ -9,6 +9,7 @@ import { Car } from "@/lib/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserContext } from "@/contexts/UserContext";
+import { SelectField } from "@/components/form/SelectField";
 
 type Props = {};
 
@@ -66,7 +67,15 @@ export const CarEdit: FC<Props> = () => {
               render={({ handleSubmit, submitErrors, submitting }) => (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <TextField field="name" label="Name" required />
-                  <TextField field="class" label="Class (e.g Supercar)" />
+                  <SelectField
+                    field="class"
+                    label="Class"
+                    data={[
+                      { label: "Road", value: "road" },
+                      { label: "Supercar", value: "supercar" },
+                      { label: "Hypercar", value: "hypercar" },
+                    ]}
+                  />
                   {submitErrors && (
                     <div className="text-red-600 text-sm w-full">
                       {submitErrors.body}

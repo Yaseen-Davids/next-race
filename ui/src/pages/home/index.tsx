@@ -1,13 +1,7 @@
 import { FC, useMemo, useState } from "react";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
-import {
-  Calendar,
-  dateFnsLocalizer,
-  EventProps,
-  ToolbarProps,
-  Event,
-} from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
 import { Button } from "@/components/ui/button";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { CreateEventDialog } from "./CreateEventDialog";
@@ -32,12 +26,13 @@ const localizer = dateFnsLocalizer({
 
 const statusColor: { [status: string]: string } = {
   new: "bg-green-100 text-green-800",
+  raced: "bg-cyan-100 text-cyan-800",
   recorded: "bg-orange-100 text-orange-600",
   edited: "bg-yellow-100 text-yellow-600",
   done: "bg-gray-200 text-gray-400",
 };
 
-interface UserEvent {
+export interface UserEvent {
   event_id: string;
   event_date: string;
   event_status: string;
@@ -98,7 +93,7 @@ export const Home: FC<HomeProps> = ({}) => {
   };
 
   return (
-    <div className="p-8 h-[700px]">
+    <div className="h-[700px]">
       {(selectedDate || selectedEventId) && (
         <CreateEventDialog
           date={selectedDate}
@@ -109,38 +104,38 @@ export const Home: FC<HomeProps> = ({}) => {
           }}
         />
       )}
-      <DnDCalendar
-        selectable
-        events={events}
-        views={["month"]}
-        defaultView="month"
-        localizer={localizer}
-        defaultDate={defaultDate}
-        draggableAccessor={(event) => event.status !== "done"}
-        onNavigate={(newDate) => setCalendarDate(newDate)}
-        onSelectSlot={(slot) => setSelectedDate(slot.start)}
-        onSelectEvent={(slot) => setSelectedEventId(slot.id)}
-        onEventDrop={(props) => handleDrop(props.event.id, props.start)}
-        components={{
-          showMore: () => <></>,
-          month: {
-            event: (
-              ev: EventProps<Event & { name: string; status: string }>
-            ) => {
-              return (
-                <p
-                  title={ev.event.name}
-                  className={`text-xs text-center px-2 py-1 rounded ${
-                    statusColor[ev.event.status]
-                  }`}
-                >
-                  {ev.event.name}
-                </p>
-              );
+      <div className="h-full w-full p-4">
+        <DnDCalendar
+          selectable
+          events={events}
+          views={["month"]}
+          defaultView="month"
+          localizer={localizer}
+          defaultDate={defaultDate}
+          draggableAccessor={(event: any) => event.status !== "done"}
+          onNavigate={(newDate) => setCalendarDate(newDate)}
+          onSelectSlot={(slot) => setSelectedDate(slot.start)}
+          onSelectEvent={(slot: any) => setSelectedEventId(slot.id)}
+          onEventDrop={(props: any) => handleDrop(props.event.id, props.start)}
+          components={{
+            showMore: () => <></>,
+            month: {
+              event: (ev: any) => {
+                return (
+                  <p
+                    title={ev.event.name}
+                    className={`text-xs text-center px-2 py-1 rounded ${
+                      statusColor[ev.event.status]
+                    }`}
+                  >
+                    {ev.event.name}
+                  </p>
+                );
+              },
             },
-          },
-        }}
-      />
+          }}
+        />
+      </div>
     </div>
   );
 };

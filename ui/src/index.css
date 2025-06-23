@@ -69,12 +69,12 @@
 }
 
 .rbc-calendar {
-  /* * {
-    border-top-color: #474747 !important;
-    border-left-color: #474747 !important;
-    border-right-color: #474747 !important;
-    border-bottom-color: #474747 !important;
-  } */
+  * {
+    border-top-color: #f3f3f3 !important;
+    border-left-color: #f3f3f3 !important;
+    border-right-color: #f3f3f3 !important;
+    border-bottom-color: #f3f3f3 !important;
+  }
 
   .rbc-month-view {
     .rbc-month-row {

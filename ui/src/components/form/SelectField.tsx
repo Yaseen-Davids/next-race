@@ -55,7 +55,6 @@ export const SelectField: FC<SelectFieldProps> = ({
                   {...input}
                   onValueChange={(value) => {
                     if (value == "") return;
-
                     if (multiple) {
                       const selected = form.getState().values[field] || [];
                       if (!selected.some((s: string) => s == value)) {
