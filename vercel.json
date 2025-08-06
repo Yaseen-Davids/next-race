@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "api/src/app.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["api/package.json", "api/node_modules/**"]
+      }
     },
     {
       "src": "ui/dist/**",
@@ -12,6 +15,11 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "api/src/app.ts" },
-    { "src": "/(.*)", "dest": "/ui/dist/$1" }
+    { "src": "/(.*\\.js)", "dest": "/ui/dist/$1" },
+    { "src": "/(.*\\.css)", "dest": "/ui/dist/$1" },
+    { "src": "/(.*\\.svg)", "dest": "/ui/dist/$1" },
+    { "src": "/(.*\\.png)", "dest": "/ui/dist/$1" },
+    { "src": "/(.*\\.ico)", "dest": "/ui/dist/$1" },
+    { "src": "/(.*)", "dest": "/ui/dist/index.html" }
   ]
 }

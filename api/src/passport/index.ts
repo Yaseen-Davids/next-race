@@ -1,20 +1,8 @@
 import passport from "passport";
-import { Request, Response, NextFunction } from "express";
 import { local } from "./strategies/local";
-import { facebookStrategy } from "./strategies/facebook";
-import { googleStrategy } from "./strategies/google";
+import { jwt } from "./strategies/jwt";
 
-export const isAuthenticated = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401);
-  res.json({ message: "You are not authenticated" });
-};
+export const isAuthenticated = passport.authenticate("jwt", { session: false });
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -25,7 +13,6 @@ passport.deserializeUser(function (user: any, done) {
 });
 
 passport.use(local);
-passport.use(facebookStrategy);
-passport.use(googleStrategy);
+passport.use(jwt);
 
 export { passport };

@@ -37,7 +37,11 @@ type UserProviderProps = {
 
 export const whoami = async () => {
   try {
-    const response = await axios.get(`/api/whoami`);
+    const response = await axios.get(`/api/whoami`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("sessionToken")}`,
+      },
+    });
     return response.data;
   } catch (error) {}
 };

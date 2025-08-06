@@ -1,15 +1,14 @@
 import { FC, useContext } from "react";
-import axios from "axios";
 import { Form } from "react-final-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { TextField } from "@/components/form/TextField";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { Car } from "@/lib/types";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UserContext } from "@/contexts/UserContext";
 import { SelectField } from "@/components/form/SelectField";
+import { useCarsApi } from "@/lib/api/cars";
 
 type Props = {};
 
@@ -18,18 +17,8 @@ export const CarEdit: FC<Props> = () => {
   const params = useParams();
   const { user } = useContext(UserContext);
 
-  const { data, isFetching } = useQuery<Car>(
-    ["fetch-car", params.id],
-    () => axios.get(`/api/cars/findBy/${params.id}`).then((res) => res.data),
-    {
-      enabled: !!params.id,
-    }
-  );
-
-  const { mutateAsync } = useMutation({
-    mutationKey: ["upsert-car", params.id],
-    mutationFn: (values: Car) => axios.post("/api/cars/upsert", values),
-  });
+  const { data, isFetching } = useCarsApi.useSingle(params.id);
+  const { mutateAsync } = useCarsApi.useUpsert();
 
   if (isFetching) return <LoadingSpinner />;
 
@@ -53,11 +42,12 @@ export const CarEdit: FC<Props> = () => {
                 try {
                   const resp = await mutateAsync({
                     id: values.id,
-                    class: values.class!,
-                    name: values.name!,
-                    user_id: user?.id,
+                    data: {
+                      class: values.class,
+                      name: values.name,
+                      user_id: user?.id,
+                    },
                   });
-                  console.log("🚀 ~ onSubmit={ ~ resp:", resp);
                   toast.success("Car successfully submitted!");
                   navigate(`/car/${resp.data}`);
                 } catch (error) {

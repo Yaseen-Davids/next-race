@@ -1,8 +1,8 @@
 import { Request, Response, Router, NextFunction } from "express";
 import passport from "passport";
 import bcrypt from "bcryptjs";
-import { query } from "src/knex";
-import { isAuthenticated } from "src/passport";
+import { query } from "../knex";
+import { isAuthenticated } from "../passport";
 import multer from "multer";
 import { Knex } from "knex";
 
@@ -11,21 +11,19 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post("/login", (req, res, next) => {
-  passport.authenticate("local", function (err: any, user: any) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).json({ message: "You weren't authenticated!" });
-    }
-
-    req.logIn(user, function (err) {
+  passport.authenticate(
+    "local",
+    { session: false },
+    function (err: any, user: any) {
       if (err) {
         return next(err);
       }
-      return res.json(user).end();
-    });
-  })(req, res, next);
+      if (!user) {
+        return res.status(401).json({ message: "You weren't authenticated!" });
+      }
+      return res.json({ token: user.token });
+    }
+  )(req, res, next);
 });
 
 router.post("/sign-up", async (req, res, next) => {
@@ -62,32 +60,6 @@ router.get(
       return res.json({ message: "Logged out!" });
     });
   }
-);
-
-router.get(
-  "/user/login/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
-);
-
-router.get(
-  "/user/login/google",
-  passport.authenticate("google", { scope: ["email"] })
-);
-
-router.get(
-  "/user/login/facebook/callback",
-  passport.authenticate("facebook", {
-    successRedirect: `${process.env.API_URL}`,
-    failureRedirect: `${process.env.API_URL}/login`,
-  })
-);
-
-router.get(
-  "/user/login/google/callback",
-  passport.authenticate("google", {
-    successRedirect: `${process.env.API_URL}`,
-    failureRedirect: `${process.env.API_URL}/login`,
-  })
 );
 
 router.post(

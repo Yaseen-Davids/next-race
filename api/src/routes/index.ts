@@ -1,6 +1,6 @@
 import { Request, Response, Router, NextFunction } from "express";
 import { port } from "../app";
-import { isAuthenticated } from "src/passport/index";
+import { isAuthenticated } from "../passport/index";
 
 const router = Router();
 

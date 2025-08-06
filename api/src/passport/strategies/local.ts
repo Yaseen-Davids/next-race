@@ -1,37 +1,39 @@
 import { query } from "../../knex";
+
+import passport from "passport";
 import bcrypt from "bcryptjs";
 import passportLocal from "passport-local";
+import { sign } from "jsonwebtoken";
+import { secrets } from "../../config/secrets";
 
 const LocalStrategy = passportLocal.Strategy;
 
 export const local = new LocalStrategy(
-  { usernameField: "username" },
-  async (name, password, done) => {
+  { usernameField: "username", session: false },
+  async (username, password, done) => {
     try {
-      const users = await query("users")
-        .select("users.*")
-        .where("username", name);
+      const user = await query("users").where("username", username).first();
 
-      if (users.length > 1) {
-        throw new Error("Ambiguos user");
+      if (!user) {
+        throw new Error("An error occurred");
       }
-
-      const user = users[0];
-
-      if (!user.password || user.password === "")
-        throw new Error("Invalid Password");
 
       bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
-          return done(undefined, user);
+          const token = sign({ userId: user.id }, secrets.jwtSecret, {
+            expiresIn: "24h",
+          });
+          return done(undefined, { ...user, token });
         } else {
           return done(undefined, false, { message: `Invalid password` });
         }
       });
     } catch (e) {
       return done(undefined, false, {
-        message: `No account found for ${name}`,
+        message: `No account found for ${username}`,
       });
     }
   }
 );
+
+export { passport };

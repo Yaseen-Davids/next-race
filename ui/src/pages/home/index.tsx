@@ -5,10 +5,10 @@ import { Calendar, dateFnsLocalizer, ToolbarProps } from "react-big-calendar";
 import { Button } from "@/components/ui/button";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { CreateEventDialog } from "./CreateEventDialog";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { toast } from "sonner";
+import { useEventsApi, useEventsByUser } from "@/lib/api/events";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -50,44 +50,31 @@ export const Home: FC<HomeProps> = ({}) => {
 
   const defaultDate = useMemo(() => new Date(), []);
 
-  const { data } = useQuery<AxiosResponse<UserEvent[]>>({
-    queryKey: ["events-by-user", calendarDate],
-    queryFn: () =>
-      axios.get(
-        `/api/events/byUser?inputDate=${format(
-          calendarDate || new Date(),
-          "yyyy-MM-dd"
-        )}`
-      ),
-  });
+  const { data } = useEventsByUser(
+    format(calendarDate || new Date(), "yyyy-MM-dd")
+  );
 
   const events = useMemo(
     () =>
-      (data?.data || []).map((d) => ({
+      (data || []).map((d) => ({
         id: d.event_id,
         name: d.race_title,
         start: new Date(d.event_date),
         end: new Date(d.event_date),
         status: d.event_status,
       })),
-    [data?.data]
+    [data]
   );
 
-  const { mutateAsync: upsertEvent } = useMutation({
-    mutationKey: ["upsert-event"] as string[],
-    mutationFn: async (values: any) => {
-      console.log("🚀 ~ values:", values);
-      return await axios.put(`/api/events/${values.eventId}`, values.values);
-    },
-  });
+  const { mutateAsync: upsertEvent } = useEventsApi.useUpdate();
 
   const handleDrop = async (eventId: string, newDate: Date) => {
     await upsertEvent({
-      eventId,
-      values: { date: format(newDate, "yyyy-MM-dd") },
+      id: eventId,
+      data: { date: format(newDate, "yyyy-MM-dd") },
     });
     queryClient.invalidateQueries({
-      queryKey: ["events-by-user"],
+      queryKey: ["events"],
     });
     toast.success("Event successfully moved!");
   };

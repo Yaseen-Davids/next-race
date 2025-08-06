@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { repository } from "./base";
 import { endpoint } from "./endpoint";
-import { isAuthenticated } from "src/passport";
-import { query } from "src/knex";
+import { isAuthenticated } from "../passport";
+import { query } from "../knex";
 
 interface Event {
   id: string;

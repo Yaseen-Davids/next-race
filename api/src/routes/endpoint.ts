@@ -16,7 +16,14 @@ export const indexEndpoint =
 export const showEndpoint =
   <T>(findBy: (value: any, key?: string) => Promise<T>) =>
   async (req: Request, res: Response) => {
-    const data = await findBy(req.params.id);
+    const data = await findBy(req.params.id, req.query.key);
+    return res.json(data);
+  };
+
+export const findAllEndpoint =
+  <T>(findAll: (value: any, key?: string) => Promise<T>) =>
+  async (req: Request, res: Response) => {
+    const data = await findAll(req.params.id, req.query.key || "id");
     return res.json(data);
   };
 
@@ -26,8 +33,8 @@ export const updateEndpoint =
     try {
       const data = await update(req.params.id, req.body);
       return res.json(data);
-    } catch (error: any) {
-      return res.json({ data: error.message });
+    } catch (error) {
+      return res.json({ data: (error as any).message });
     }
   };
 
@@ -37,8 +44,8 @@ export const upsertEndpoint =
     try {
       const data = await upsert(req.body);
       return res.json(data);
-    } catch (error: any) {
-      return res.json({ data: error.message });
+    } catch (error) {
+      return res.json({ data: (error as any).message });
     }
   };
 
@@ -46,10 +53,10 @@ export const createEndpoint =
   <T>(create: (data: Partial<T>) => Promise<string>) =>
   async (req: Request, res: Response) => {
     try {
-      const data = await create(req.body);
+      const data = await create(req.body.data);
       return res.json(data);
-    } catch (error: any) {
-      return res.json({ data: error.message });
+    } catch (error) {
+      return res.json({ data: (error as any).message });
     }
   };
 
@@ -59,8 +66,8 @@ export const removeEndpoint =
     try {
       await remove(req.params.id);
       return res.json({});
-    } catch (error: any) {
-      return res.json({ data: error.message });
+    } catch (error) {
+      return res.json({ data: (error as any).message });
     }
   };
 
@@ -83,6 +90,7 @@ export const endpoint = <T>(
     create,
     remove,
     upsert,
+    findAll,
   }: {
     all: () => Promise<T[]>;
     findBy: (value: any, key?: string) => Promise<T>;
@@ -90,12 +98,15 @@ export const endpoint = <T>(
     create: (data: Partial<T>) => Promise<string>;
     remove: (id: string) => Promise<void>;
     upsert: (data: Partial<T>) => Promise<string>;
+    findAll: (value: any, key?: string) => Promise<T[]>;
   },
   validators: any = {}
 ) => {
   const endpoint = express.Router();
+  // endpoint.get("/all/:id", maybe(validators.findAll), findAllEndpoint(findAll));
   endpoint.get("/", maybe(validators.all), indexEndpoint(all));
-  endpoint.get("/findBy/:id", maybe(validators.findBy), showEndpoint(findBy));
+  endpoint.get("/single/:id", maybe(validators.findBy), showEndpoint(findBy));
+  endpoint.get("/all/:id", maybe(validators.findAll), showEndpoint(findAll));
   endpoint.put("/:id", maybe(validators.update), updateEndpoint(update));
   endpoint.post("/", maybe(validators.create), createEndpoint(create));
   endpoint.delete("/:id", maybe(validators.remove), removeEndpoint(remove));

@@ -1,4 +1,4 @@
-import { query } from "src/knex";
+import { query } from "../knex";
 
 const all =
   <T>(table: string) =>
@@ -51,6 +51,12 @@ const upsert =
     return id!;
   };
 
+const findAll =
+  <T>(table: string) =>
+  async (value: any, key: string = "id"): Promise<T[]> => {
+    return await query(table).select().where(key, value);
+  };
+
 export const repository = <T>(table: string) => ({
   all: all<T>(table),
   findBy: findBy<T>(table),
@@ -58,4 +64,5 @@ export const repository = <T>(table: string) => ({
   update: update<T>(table),
   remove: remove<T>(table),
   upsert: upsert<T>(table),
+  findAll: findAll<T>(table),
 });

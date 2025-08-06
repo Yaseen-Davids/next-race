@@ -7,17 +7,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, useForm } from "react-final-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { TextCombo } from "@/components/form/ComboField";
 import { DateField } from "@/components/form/DateField";
-import { Car } from "@/lib/types";
 import { SubmissionErrors } from "final-form";
 import { UserContext } from "@/contexts/UserContext";
 import { SelectField } from "@/components/form/SelectField";
 import { SwitchField } from "@/components/form/SwitchField";
+import {
+  useEventsApi,
+  useEventsWithCars,
+  useNextEvents,
+} from "@/lib/api/events";
+import { useCarsApi, useCarsToRace } from "@/lib/api/cars";
+import { format } from "date-fns";
 
 type CreateEventDialogProps = {
   eventId: string | undefined;
@@ -33,51 +38,36 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
   const { user } = useContext(UserContext);
   const queryClient = useQueryClient();
 
-  const { data: eventData, isFetching: fetchingEvent } = useQuery<
-    AxiosResponse<any>
-  >({
-    queryKey: ["event-by-id", eventId],
-    queryFn: () => axios.get(`/api/events/byIdWithCars/${eventId}`),
-    enabled: !!eventId,
-  });
+  const { mutateAsync: upsertEvent } = useNextEvents();
+  const { mutateAsync: removeEvent } = useEventsApi.useRemove();
 
-  const { data, isFetching } = useQuery<AxiosResponse<Car[]>>({
-    queryKey: ["cars"],
-    queryFn: () => axios.get("/api/cars/"),
-  });
+  const { data: eventData, isFetching: fetchingEvent } = useEventsWithCars(
+    eventId!
+  );
+  const { data, isFetching } = useCarsApi.useAll();
 
   const allCars = useMemo(
     () =>
-      (data?.data || [])
-        .map((d: Car) => ({
-          value: d.id!,
+      (data || [])
+        .map((d) => ({
+          value: d.id,
           label: d.name,
         }))
         .sort((a, b) => a.label.localeCompare(b.label)),
     [data]
   );
 
-  const { mutateAsync: upsertEvent } = useMutation({
-    mutationKey: ["create-event"],
-    mutationFn: (values: any) => axios.post("/api/events/new-event", values),
-  });
-
-  const { mutateAsync: removeEvent } = useMutation({
-    mutationKey: ["create-event"],
-    mutationFn: (id: string) => axios.delete(`/api/events/${id}`),
-  });
-
   const event = useMemo(() => {
     if (fetchingEvent || !eventId) return {};
-    const { cars, ...rest } = eventData?.data![0];
+    const { cars, ...rest } = eventData![0];
     const [car1, car2] = cars;
     return { ...rest, car1, car2 };
   }, [eventData, eventId]);
 
   const handleRemoveEvent = async (eventId: string) => {
-    await removeEvent(eventId);
+    await removeEvent({ id: eventId });
     queryClient.invalidateQueries({
-      queryKey: ["events-by-user"],
+      queryKey: ["events"],
     });
     toast.success("Event successfully removed!");
     handleClose();
@@ -104,10 +94,11 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
               const { car1, car2, ...rest } = values;
               await upsertEvent({
                 ...rest,
+                date: format(values.date, "yyyy-MM-dd"),
                 user_id: user?.id,
                 cars: [car1.value, car2.value],
               });
-              queryClient.invalidateQueries({ queryKey: ["events-by-user"] });
+              queryClient.invalidateQueries({ queryKey: ["events"] });
               toast.success(`Event ${eventId ? "updated" : "created"}!`);
               handleClose();
             } catch (error) {
@@ -159,17 +150,13 @@ const FormDetail: FC<FormDetailProps> = ({
     [form.getState().values.car1]
   );
 
-  const { data, isFetching } = useQuery<AxiosResponse<Car[]>>({
-    queryKey: ["carsToRace", primaryCarID],
-    queryFn: () => axios.get(`/api/cars/carsToRace/${primaryCarID.value}`),
-    enabled: !!primaryCarID,
-  });
+  const { data, isFetching } = useCarsToRace(primaryCarID?.value);
 
   const availableCars = useMemo(
     () =>
-      (data?.data || [])
-        .map((d: Car) => ({
-          value: d.id!,
+      (data || [])
+        .map((d) => ({
+          value: d.id,
           label: d.name,
         }))
         .sort((a, b) => a.label.localeCompare(b.label)),
