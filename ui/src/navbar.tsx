@@ -19,7 +19,7 @@ export const Navbar: FC<NavbarProps> = ({}) => {
   return (
     <div className="flex flex-row w-full bg-red-900 items-center justify-between py-2 px-4">
       <Link to="/" className="font-bold text-white text-xl">
-        [INFIN8]'s Garage
+        Garage
       </Link>
       <div className="space-x-8">
         <Button
