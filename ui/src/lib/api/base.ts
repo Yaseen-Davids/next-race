@@ -22,6 +22,7 @@ export const useAll = <T>(
           },
         })
         .then((res) => res.data),
+    retry: false,
   });
 };
 
@@ -43,6 +44,7 @@ export const useFindAll = <T>(
           },
         })
         .then((res) => res.data),
+    retry: false,
   });
 };
 
@@ -64,6 +66,7 @@ export const useFindBy = <T>(
           },
         })
         .then((res) => res.data),
+    retry: false,
   });
 };
 
@@ -84,7 +87,8 @@ export const useSingle = <T>(
           },
         })
         .then((res) => res.data),
-    enabled: !!id,
+    enabled: !!id && id !== "",
+    retry: false,
   });
 };
 
@@ -209,6 +213,7 @@ export const useApiGet = <T>(params: CreateHooksParams): UseQueryResult<T> => {
         })
         .then((res) => res.data),
     refetchInterval: () => params.interval || false,
+    retry: false,
   });
 };
 
@@ -227,5 +232,6 @@ export const useApiPost = <T>(
           Authorization: `Bearer ${localStorage.getItem("sessionToken")}`,
         },
       }),
+    retry: false,
   });
 };

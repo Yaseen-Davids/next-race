@@ -9,7 +9,7 @@ import { UserProvider } from "./contexts/UserContext.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { Login } from "./pages/user/login.tsx";
 import { Register } from "./pages/user/register.tsx";
-import { CarEdit } from "./pages/car/edit.tsx";
+import { Cars } from "./pages/car/Cars.tsx";
 import { Toaster } from "@/components/ui/sonner";
 // import { ThemeProvider } from "./components/theme-provider.tsx";
 
@@ -33,8 +33,8 @@ const router = createBrowserRouter([
         element: <App />,
       },
       {
-        path: "/car/:id?",
-        element: <CarEdit />,
+        path: "/cars",
+        element: <Cars />,
       },
     ],
   },

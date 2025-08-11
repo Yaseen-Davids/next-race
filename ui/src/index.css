@@ -69,25 +69,29 @@
 }
 
 .rbc-calendar {
-  * {
-    border-top-color: #f3f3f3 !important;
-    border-left-color: #f3f3f3 !important;
-    border-right-color: #f3f3f3 !important;
-    border-bottom-color: #f3f3f3 !important;
+
+  .rbc-toolbar {
+    gap: 0.5rem;
+    flex-direction: row !important;
   }
 
   .rbc-month-view {
+    border: none;
+
+    * {
+        border-top-color: transparent !important;
+        border-left-color: transparent !important;
+        border-right-color: transparent !important;
+        border-bottom-color: transparent !important;
+    }
+
     .rbc-month-row {
-      
-      /* .rbc-off-range-bg {
-        background-color: #474747;
-      } */
-      
-      /* .rbc-today {
-        background-color: #474747;
-      } */
-      
+      border-top: 1px solid #e1e1e1 !important;
+
       .rbc-row-content {
+        .rbc-date-cell {
+          text-align: center;
+        }
 
         .rbc-row {
           

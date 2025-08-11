@@ -24,7 +24,8 @@ router.get(
     try {
       const car_id = req.params.id;
 
-      if (car_id === "" || !car_id) throw "Car ID required";
+      if (car_id === "" || !car_id || car_id === "undefined")
+        throw "Car ID required";
 
       const data = await query.raw(
         `

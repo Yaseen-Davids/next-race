@@ -8,9 +8,9 @@ import path from "path";
 import cors from "cors";
 
 import indexRouter from "./routes/index";
-import userRouter from "./routes/user";
-import carRouter from "./routes/car";
-import eventRouter from "./routes/event";
+import userRouter from "./routes/users";
+import carRouter from "./routes/cars";
+import eventRouter from "./routes/events";
 
 import { passport } from "./passport/index";
 

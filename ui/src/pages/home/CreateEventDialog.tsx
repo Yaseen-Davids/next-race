@@ -23,6 +23,7 @@ import {
 } from "@/lib/api/events";
 import { useCarsApi, useCarsToRace } from "@/lib/api/cars";
 import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type CreateEventDialogProps = {
   eventId: string | undefined;
@@ -58,11 +59,11 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
   );
 
   const event = useMemo(() => {
-    if (fetchingEvent || !eventId) return {};
+    if (fetchingEvent || !eventId) return undefined;
     const { cars, ...rest } = eventData![0];
     const [car1, car2] = cars;
     return { ...rest, car1, car2 };
-  }, [eventData, eventId]);
+  }, [fetchingEvent, eventData, eventId]);
 
   const handleRemoveEvent = async (eventId: string) => {
     await removeEvent({ id: eventId });
@@ -79,52 +80,67 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Event</DialogTitle>
         </DialogHeader>
-        <Form
-          initialValues={
-            eventId
-              ? event
-              : {
-                  date,
-                  platform: "youtube",
-                  status: "new",
-                }
-          }
-          onSubmit={async (values) => {
-            try {
-              const { car1, car2, ...rest } = values;
-              await upsertEvent({
-                ...rest,
-                date: format(values.date, "yyyy-MM-dd"),
-                user_id: user?.id,
-                cars: [car1.value, car2.value],
-              });
-              queryClient.invalidateQueries({ queryKey: ["events"] });
-              toast.success(`Event ${eventId ? "updated" : "created"}!`);
-              handleClose();
-            } catch (error) {
-              return { body: "Something went wrong. Please try again" };
+        {fetchingEvent ? (
+          <div className="flex flex-col gap-6">
+            {new Array(6).fill(1).map((_, i) => (
+              <div className="flex flex-col gap-2" key={i}>
+                <Skeleton className="h-6 w-60" />
+                <Skeleton className="h-8" />
+              </div>
+            ))}
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-8" />
+              <Skeleton className="h-8" />
+            </div>
+          </div>
+        ) : (
+          <Form
+            initialValues={
+              eventId
+                ? event
+                : {
+                    date,
+                    platform: "youtube",
+                    status: "new",
+                  }
             }
-          }}
-          render={({ handleSubmit, submitErrors, submitting }) => (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <FormDetail
-                cars={allCars}
-                loadingCars={isFetching}
-                submitting={submitting}
-                submitErrors={submitErrors}
-              />
-              {eventId && (
-                <Button
-                  variant={"destructive"}
-                  className="w-full bg-red-100 hover:bg-red-200 text-red-600"
-                  onClick={() => handleRemoveEvent(eventId)}
-                >
-                  Delete
-                </Button>
-              )}
-            </form>
-          )}
-        />
+            onSubmit={async (values) => {
+              try {
+                const { car1, car2, ...rest } = values;
+                await upsertEvent({
+                  ...rest,
+                  date: format(values.date, "yyyy-MM-dd"),
+                  user_id: user?.id,
+                  cars: [car1.value, car2.value],
+                });
+                queryClient.invalidateQueries({ queryKey: ["events"] });
+                toast.success(`Event ${eventId ? "updated" : "created"}!`);
+                handleClose();
+              } catch (error) {
+                return { body: "Something went wrong. Please try again" };
+              }
+            }}
+            render={({ handleSubmit, submitErrors, submitting }) => (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <FormDetail
+                  cars={allCars}
+                  loadingCars={isFetching}
+                  submitting={submitting}
+                  submitErrors={submitErrors}
+                />
+                {eventId && (
+                  <Button
+                    variant={"destructive"}
+                    className="flex w-full justify-center bg-transparent hover:bg-red-200 border border-red-200 text-red-600"
+                    onClick={() => handleRemoveEvent(eventId)}
+                  >
+                    Delete
+                  </Button>
+                )}
+              </form>
+            )}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -210,7 +226,7 @@ const FormDetail: FC<FormDetailProps> = ({
           type="submit"
           variant="secondary"
           disabled={submitting}
-          className="flex w-full justify-center ho"
+          className="flex w-full justify-center bg-emerald-100 hover:bg-emerald-200"
         >
           {submitting ? <LoadingSpinner size="xs" isButton /> : "Save"}
         </Button>
