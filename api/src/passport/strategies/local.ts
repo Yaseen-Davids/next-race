@@ -21,7 +21,7 @@ export const local = new LocalStrategy(
       bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
           const token = sign({ userId: user.id }, secrets.jwtSecret, {
-            expiresIn: "24h",
+            expiresIn: "7d",
           });
           return done(undefined, { ...user, token });
         } else {
