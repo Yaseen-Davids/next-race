@@ -26,6 +26,10 @@ router.get(
   "/byIdWithCars/:id",
   isAuthenticated,
   async (req: Request, res: Response, next: NextFunction) => {
+    if (req.params.id === "undefined") {
+      return res.json([]);
+    }
+
     try {
       const data = await query.raw(
         `

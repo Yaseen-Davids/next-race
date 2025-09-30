@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Form, useForm } from "react-final-form";
+import { Form } from "react-final-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -21,7 +21,7 @@ import {
   useEventsWithCars,
   useNextEvents,
 } from "@/lib/api/events";
-import { useCarsApi, useCarsToRace } from "@/lib/api/cars";
+import { useCarsApi } from "@/lib/api/cars";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -61,8 +61,8 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
   const event = useMemo(() => {
     if (fetchingEvent || !eventId) return undefined;
     const { cars, ...rest } = eventData![0];
-    const [car1, car2] = cars;
-    return { ...rest, car1, car2 };
+    const [car1, car2, car3] = cars;
+    return { ...rest, car1, car2, car3 };
   }, [fetchingEvent, eventData, eventId]);
 
   const handleRemoveEvent = async (eventId: string) => {
@@ -106,12 +106,12 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
             }
             onSubmit={async (values) => {
               try {
-                const { car1, car2, ...rest } = values;
+                const { car1, car2, car3, ...rest } = values;
                 await upsertEvent({
                   ...rest,
                   date: format(values.date, "yyyy-MM-dd"),
                   user_id: user?.id,
-                  cars: [car1.value, car2.value],
+                  cars: [car1.value, car2.value, car3.value].filter(Boolean),
                 });
                 queryClient.invalidateQueries({ queryKey: ["events"] });
                 toast.success(`Event ${eventId ? "updated" : "created"}!`);
@@ -159,26 +159,6 @@ const FormDetail: FC<FormDetailProps> = ({
   submitting,
   loadingCars,
 }) => {
-  const form = useForm();
-
-  const primaryCarID = useMemo(
-    () => form.getState().values.car1,
-    [form.getState().values.car1]
-  );
-
-  const { data, isFetching } = useCarsToRace(primaryCarID?.value);
-
-  const availableCars = useMemo(
-    () =>
-      (data || [])
-        .map((d) => ({
-          value: d.id,
-          label: d.name,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [data]
-  );
-
   return (
     <>
       <DateField field="date" label="Date" placeholder="Pick a date" />
@@ -193,8 +173,15 @@ const FormDetail: FC<FormDetailProps> = ({
         required
         field="car2"
         label="Available AI Car"
-        data={availableCars}
-        isFetching={isFetching}
+        data={cars}
+        isFetching={loadingCars}
+      />
+      <TextCombo
+        required
+        field="car3"
+        label="Available AI Car"
+        data={cars}
+        isFetching={loadingCars}
       />
       <SwitchField field="user_comment" label="User comment" />
       <SelectField
