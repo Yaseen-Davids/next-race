@@ -6,6 +6,8 @@ import {
 } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
 
+const STALE_TIME = 1000 * 60 * 30; // 30 minutes
+
 export const useAll = <T>(
   endpoint: string,
   queryKey?: string
@@ -23,6 +25,7 @@ export const useAll = <T>(
         })
         .then((res) => res.data),
     retry: false,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -45,6 +48,7 @@ export const useFindAll = <T>(
         })
         .then((res) => res.data),
     retry: false,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -67,6 +71,7 @@ export const useFindBy = <T>(
         })
         .then((res) => res.data),
     retry: false,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -89,6 +94,7 @@ export const useSingle = <T>(
         .then((res) => res.data),
     enabled: !!id && id !== "",
     retry: false,
+    staleTime: STALE_TIME,
   });
 };
 
@@ -212,8 +218,8 @@ export const useApiGet = <T>(params: CreateHooksParams): UseQueryResult<T> => {
           },
         })
         .then((res) => res.data),
-    refetchInterval: () => params.interval || false,
     retry: false,
+    staleTime: STALE_TIME,
   });
 };
 
