@@ -66,13 +66,14 @@ router.get(
         SELECT
             e.id AS event_id,
             e.status as event_status,
+            e.platform as event_type,
             to_char(e.date, 'YYYY-MM-DD') AS event_date,
             STRING_AGG(c.name, ' vs ' ORDER BY c.name) AS race_title
         FROM events e
         JOIN races r ON r.event_id = e.id
         JOIN cars c ON c.id = r.car_id
         WHERE e.date BETWEEN (?::timestamp - INTERVAL '1 month') AND (?::timestamp + INTERVAL '1 month')
-        GROUP BY e.id, e.date, e.status
+        GROUP BY e.id, e.date, e.status, e.platform
         ORDER BY e.date ASC;
         `,
         [inputDate, inputDate]

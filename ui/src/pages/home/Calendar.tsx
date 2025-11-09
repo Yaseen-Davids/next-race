@@ -23,7 +23,7 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const statusColor: { [status: string]: string } = {
+export const statusColor: { [status: string]: string } = {
   new: "bg-green-100 text-green-800",
   raced: "bg-cyan-100 text-cyan-800",
   recorded: "bg-orange-100 text-orange-600",
@@ -64,6 +64,7 @@ export const EventsCalendar: FC<EventsCalendarProps> = ({
         start: new Date(d.event_date),
         end: new Date(d.event_date),
         status: d.event_status,
+        type: d.event_type,
       })),
     [data]
   );
@@ -101,10 +102,15 @@ export const EventsCalendar: FC<EventsCalendarProps> = ({
             return (
               <p
                 title={ev.event.name}
-                className={`text-xs text-center px-2 py-1 ${
+                className={`flex flex-row gap-2 text-xs text-center px-2 py-1 ${
                   statusColor[ev.event.status]
                 } rounded-full sm:rounded`}
               >
+                <img
+                  src={`logos/${ev.event.type}.png`}
+                  alt={ev.event.type}
+                  className="w-4 h-4"
+                />
                 <span className="hidden sm:block">{ev.event.name}</span>
                 <span className="block sm:hidden h-1 w-4"></span>
               </p>

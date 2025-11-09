@@ -16,6 +16,7 @@ interface EventsByUser {
   event_status: string;
   event_date: Date;
   race_title: string;
+  event_type: string;
 }
 
 interface EventsWithCars extends Event {

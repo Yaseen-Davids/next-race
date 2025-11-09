@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { cn } from "@/lib/utils";
 
 const validate = (value: any) =>
   value && value != "" ? undefined : "Required";
@@ -19,7 +20,7 @@ type SelectFieldProps = {
   isFetching?: boolean;
   required?: boolean;
   multiple?: boolean;
-  data: { value: string; label: string }[];
+  data: { value: string; label: string; icon?: string; color?: string }[];
 };
 
 export const SelectField: FC<SelectFieldProps> = ({
@@ -81,8 +82,12 @@ export const SelectField: FC<SelectFieldProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     {data.map((row, i) => (
-                      <SelectItem key={i} value={row.value}>
-                        {row.label}
+                      <SelectItem
+                        key={i}
+                        value={row.value}
+                        className={cn("", row.color)}
+                      >
+                        <span>{row.label}</span>
                       </SelectItem>
                     ))}
                   </SelectContent>

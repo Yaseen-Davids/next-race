@@ -34,7 +34,7 @@ export const Cars: FC<Props> = () => {
           }}
         />
       )}
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-col gap-8">
         <h2
           className="flex flex-row gap-4 items-center group cursor-pointer"
           onClick={() => navigate("/")}
@@ -44,10 +44,10 @@ export const Cars: FC<Props> = () => {
         </h2>
         <Button
           variant="outline"
-          className=""
+          className="bg-emerald-100 text-emerald-600 border-emerald-100"
           onClick={() => setToggleCarEdit(true)}
         >
-          Add
+          Add a new car
         </Button>
       </div>
       <div>

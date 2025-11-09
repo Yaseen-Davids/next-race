@@ -1,10 +1,4 @@
 import { FC, useContext, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form } from "react-final-form";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,6 +18,15 @@ import {
 import { useCarsApi } from "@/lib/api/cars";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TextField } from "@/components/form/TextField";
+import { statusColor } from "./Calendar";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 type CreateEventDialogProps = {
   eventId: string | undefined;
@@ -75,74 +78,77 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
   };
 
   return (
-    <Dialog open onOpenChange={() => handleClose()}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Event</DialogTitle>
-        </DialogHeader>
-        {fetchingEvent ? (
-          <div className="flex flex-col gap-6">
-            {new Array(6).fill(1).map((_, i) => (
-              <div className="flex flex-col gap-2" key={i}>
-                <Skeleton className="h-6 w-60" />
+    <Sheet open onOpenChange={handleClose}>
+      <SheetContent className="min-w-[100dvw] sm:min-w-[50dvw] h-full overflow-y-auto p-0 border-0">
+        <SheetHeader className="flex flex-row items-center p-3 px-6">
+          <SheetTitle className="text-xl text-gray-700">Event</SheetTitle>
+          <SheetClose />
+        </SheetHeader>
+        <div className="p-3 px-6">
+          {fetchingEvent ? (
+            <div className="flex flex-col gap-6">
+              {new Array(6).fill(1).map((_, i) => (
+                <div className="flex flex-col gap-2" key={i}>
+                  <Skeleton className="h-6 w-60" />
+                  <Skeleton className="h-8" />
+                </div>
+              ))}
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-8" />
                 <Skeleton className="h-8" />
               </div>
-            ))}
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-8" />
-              <Skeleton className="h-8" />
             </div>
-          </div>
-        ) : (
-          <Form
-            initialValues={
-              eventId
-                ? event
-                : {
-                    date,
-                    platform: "youtube",
-                    status: "new",
-                  }
-            }
-            onSubmit={async (values) => {
-              try {
-                const { car1, car2, car3, ...rest } = values;
-                await upsertEvent({
-                  ...rest,
-                  date: format(values.date, "yyyy-MM-dd"),
-                  user_id: user?.id,
-                  cars: [car1.value, car2.value, car3.value].filter(Boolean),
-                });
-                queryClient.invalidateQueries({ queryKey: ["events"] });
-                toast.success(`Event ${eventId ? "updated" : "created"}!`);
-                handleClose();
-              } catch (error) {
-                return { body: "Something went wrong. Please try again" };
+          ) : (
+            <Form
+              initialValues={
+                eventId
+                  ? event
+                  : {
+                      date,
+                      platform: "youtube",
+                      status: "new",
+                    }
               }
-            }}
-            render={({ handleSubmit, submitErrors, submitting }) => (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <FormDetail
-                  cars={allCars}
-                  loadingCars={isFetching}
-                  submitting={submitting}
-                  submitErrors={submitErrors}
-                />
-                {eventId && (
-                  <Button
-                    variant={"destructive"}
-                    className="flex w-full justify-center bg-transparent hover:bg-red-200 border border-red-200 text-red-600"
-                    onClick={() => handleRemoveEvent(eventId)}
-                  >
-                    Delete
-                  </Button>
-                )}
-              </form>
-            )}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+              onSubmit={async (values) => {
+                try {
+                  const { car1, car2, car3, ...rest } = values;
+                  await upsertEvent({
+                    ...rest,
+                    date: format(values.date, "yyyy-MM-dd"),
+                    user_id: user?.id,
+                    cars: [car1.value, car2.value, car3.value].filter(Boolean),
+                  });
+                  queryClient.invalidateQueries({ queryKey: ["events"] });
+                  toast.success(`Event ${eventId ? "updated" : "created"}!`);
+                  handleClose();
+                } catch (error) {
+                  return { body: "Something went wrong. Please try again" };
+                }
+              }}
+              render={({ handleSubmit, submitErrors, submitting }) => (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <FormDetail
+                    cars={allCars}
+                    loadingCars={isFetching}
+                    submitting={submitting}
+                    submitErrors={submitErrors}
+                  />
+                  {eventId && (
+                    <Button
+                      variant={"destructive"}
+                      className="flex w-full justify-center bg-transparent hover:bg-red-200 border border-red-200 text-red-600"
+                      onClick={() => handleRemoveEvent(eventId)}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                </form>
+              )}
+            />
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
@@ -162,6 +168,53 @@ const FormDetail: FC<FormDetailProps> = ({
   return (
     <>
       <DateField field="date" label="Date" placeholder="Pick a date" />
+      <div className="grid grid-cols-2 gap-2">
+        <SelectField
+          field="status"
+          label="Status"
+          data={[
+            {
+              label: "New",
+              value: "new",
+              color: statusColor["new"].split(" ")[1],
+            },
+            {
+              label: "Raced",
+              value: "raced",
+              color: statusColor["raced"].split(" ")[1],
+            },
+            {
+              label: "Recorded",
+              value: "recorded",
+              color: statusColor["recorded"].split(" ")[1],
+            },
+            {
+              label: "Edited",
+              value: "edited",
+              color: statusColor["edited"].split(" ")[1],
+            },
+            {
+              label: "Done",
+              value: "done",
+              color: statusColor["done"].split(" ")[1],
+            },
+          ]}
+        />
+        <SelectField
+          field="platform"
+          label="Platform"
+          data={[
+            { label: "YouTube", value: "youtube", icon: "youtube" },
+            {
+              label: "YouTube Shorts",
+              value: "youtube_shorts",
+              icon: "youtube_shorts",
+            },
+            { label: "TikTok", value: "tiktok", icon: "tiktok" },
+            { label: "Instagram", value: "instagram", icon: "instagram" },
+          ]}
+        />
+      </div>
       <TextCombo
         required
         field="car1"
@@ -183,28 +236,8 @@ const FormDetail: FC<FormDetailProps> = ({
         data={cars}
         isFetching={loadingCars}
       />
-      <SwitchField field="user_comment" label="User comment" />
-      <SelectField
-        field="platform"
-        label="Platform"
-        data={[
-          { label: "YouTube", value: "youtube" },
-          { label: "YouTube Shorts", value: "youtube-shorts" },
-          { label: "TikTok", value: "tiktok" },
-          { label: "Instagram", value: "instagram" },
-        ]}
-      />
-      <SelectField
-        field="status"
-        label="Status"
-        data={[
-          { label: "New", value: "new" },
-          { label: "Raced", value: "raced" },
-          { label: "Recorded", value: "recorded" },
-          { label: "Edited", value: "edited" },
-          { label: "Done", value: "done" },
-        ]}
-      />
+      <SwitchField field="user_comment" label="Viewer suggested?" />
+      <TextField multiline label="Comment" field="comment" />
       {submitErrors && (
         <div className="text-red-600 text-sm w-full">{submitErrors.body}</div>
       )}
