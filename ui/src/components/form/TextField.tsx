@@ -17,6 +17,7 @@ type TextFieldProps = {
   multiline?: boolean;
   placeholder?: string;
   inputStyle?: string;
+  rows?: number;
 };
 
 export const TextField: FC<TextFieldProps> = ({
@@ -28,6 +29,7 @@ export const TextField: FC<TextFieldProps> = ({
   type = "text",
   multiline = false,
   inputStyle = "",
+  rows = 3,
 }) => {
   const [showPassword, toggleShowPassword] = useState(false);
 
@@ -48,11 +50,12 @@ export const TextField: FC<TextFieldProps> = ({
             multiline ? (
               <div className="w-full">
                 <Textarea
+                  rows={rows}
                   disabled={disabled}
                   onChange={input.onChange}
                   value={input.value}
                   placeholder={placeholder}
-                  className={`w-full placeholder:text-sm h-40 ${inputStyle} ${
+                  className={`w-full placeholder:text-sm ${inputStyle} ${
                     meta.error && meta.touched ? "border-red-600" : ""
                   }`}
                 />

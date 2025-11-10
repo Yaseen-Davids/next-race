@@ -1,6 +1,6 @@
 import { FC, useContext, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Form } from "react-final-form";
+import { Form, useFormState } from "react-final-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -27,6 +27,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { CopyIcon } from "lucide-react";
 
 type CreateEventDialogProps = {
   eventId: string | undefined;
@@ -215,20 +217,22 @@ const FormDetail: FC<FormDetailProps> = ({
           ]}
         />
       </div>
-      <TextCombo
-        required
-        field="car1"
-        label="Primary car"
-        data={cars}
-        isFetching={loadingCars}
-      />
-      <TextCombo
-        required
-        field="car2"
-        label="Available AI Car"
-        data={cars}
-        isFetching={loadingCars}
-      />
+      <div className="grid grid-cols-2 gap-2">
+        <TextCombo
+          required
+          field="car1"
+          label="Primary car"
+          data={cars}
+          isFetching={loadingCars}
+        />
+        <TextCombo
+          required
+          field="car2"
+          label="Available AI Car"
+          data={cars}
+          isFetching={loadingCars}
+        />
+      </div>
       <TextCombo
         required
         field="car3"
@@ -238,6 +242,7 @@ const FormDetail: FC<FormDetailProps> = ({
       />
       <SwitchField field="user_comment" label="Viewer suggested?" />
       <TextField multiline label="Comment" field="comment" />
+      <VideoDetails />
       {submitErrors && (
         <div className="text-red-600 text-sm w-full">{submitErrors.body}</div>
       )}
@@ -250,6 +255,89 @@ const FormDetail: FC<FormDetailProps> = ({
         >
           {submitting ? <LoadingSpinner size="xs" isButton /> : "Save"}
         </Button>
+      </div>
+    </>
+  );
+};
+
+const useHashTag = (name: string) =>
+  `#${(name ?? "").toLowerCase().replace(/[\s]/g, "")}`;
+
+const VideoDetails = () => {
+  const state = useFormState();
+
+  const title = useMemo(() => {
+    return new Array(3)
+      .fill(1)
+      .reduce((acc, _, i) => {
+        const car = state.values[`car${i + 1}`];
+        if (car) {
+          const hasNext = state.values[`car${i + 2}`];
+          acc.push(`${car.label} ${hasNext ? "vs" : "DRAG RACE"}`);
+        }
+        return acc;
+      }, [])
+      .join(" ");
+  }, [state.values]);
+
+  const description = useMemo(() => {
+    return new Array(3)
+      .fill(1)
+      .reduce((acc, _, i) => {
+        const car = state.values[`car${i + 1}`];
+        if (car) {
+          acc.push(useHashTag(car.label));
+        }
+        return acc;
+      }, [])
+      .join(" ");
+  }, [state.values]);
+
+  return (
+    <>
+      <div>
+        <div className="flex flex-row gap-2 items-center">
+          <label className="block text-sm/6 font-medium text-gray-900">
+            Title
+          </label>
+          <Button
+            type="button"
+            variant="ghost"
+            className="p-0 h-5 w-10 px-2 py-1"
+          >
+            <CopyIcon />
+          </Button>
+        </div>
+        <div className="mt-1">
+          <Textarea
+            rows={3}
+            defaultValue={title}
+            placeholder="Select cars to use this title"
+            className="w-full placeholder:text-sm"
+          />
+        </div>
+      </div>
+      <div>
+        <div className="flex flex-row gap-2 items-center">
+          <label className="block text-sm/6 font-medium text-gray-900">
+            Description
+          </label>
+          <Button
+            type="button"
+            variant="ghost"
+            className="p-0 h-5 w-10 px-2 py-1"
+          >
+            <CopyIcon />
+          </Button>
+        </div>
+        <div className="mt-1">
+          <Textarea
+            rows={3}
+            defaultValue={description}
+            placeholder="Select cars to use this description"
+            className="w-full placeholder:text-sm"
+          />
+        </div>
       </div>
     </>
   );
