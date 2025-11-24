@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { Field } from "react-final-form";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "lucide-react";
@@ -11,7 +11,7 @@ const validate = (value: any) =>
   value && value != "" ? undefined : "Required";
 
 type DateFieldProps = {
-  label: string;
+  label: string | ReactNode;
   field: string;
   placeholder?: string;
   required?: boolean;

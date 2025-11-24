@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import { Field, useForm } from "react-final-form";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
 import Select from "react-select";
@@ -7,7 +7,7 @@ const validate = (value: any) =>
   value && value != "" ? undefined : "Required";
 
 type TextComboProps = {
-  label: string;
+  label: string | ReactNode;
   field: string;
   isFetching?: boolean;
   required?: boolean;

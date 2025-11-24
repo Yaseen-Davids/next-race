@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { CreateEventDialog } from "./CreateEventDialog";
+import { CreateEventDialog } from "./Event/Create";
 import { EventsCalendar } from "./Calendar";
 import { useCarsApi } from "@/lib/api/cars";
 import { ArrowRightIcon } from "lucide-react";
