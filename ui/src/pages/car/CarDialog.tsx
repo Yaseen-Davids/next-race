@@ -1,6 +1,4 @@
 import { FC, useContext } from "react";
-import { SelectField } from "@/components/form/SelectField";
-import { TextField } from "@/components/form/TextField";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +14,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Form } from "react-final-form";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Car as CarIcon, Pencil, SaveIcon, Trash } from "lucide-react";
+import { TabDetails } from "./Car/TabDetails";
+import { TabSpecifications } from "./Car/TabSpecifications";
 
 type CarDialogProps = {
   carId?: string;
@@ -65,17 +67,27 @@ export const CarDialog: FC<CarDialogProps> = ({ carId, handleClose }) => {
           ) : (
             <Form
               initialValues={{
-                id: data?.id || "",
-                name: data?.name || "",
+                ...data,
                 class: data?.class.toLowerCase() || "road",
               }}
               onSubmit={async (values: Partial<Car>) => {
+                console.log("🚀 ~ CarDialog ~ values:", values);
                 try {
                   await mutateAsync({
                     id: carId,
                     data: {
                       class: values.class,
                       name: values.name,
+                      hp: values.hp,
+                      nm: values.nm,
+                      kg: values.kg,
+                      "0_100": values["0_100"],
+                      "0_200": values["0_200"],
+                      "0_250": values["0_250"],
+                      "0_300": values["0_300"],
+                      "0_350": values["0_350"],
+                      "0_400": values["0_400"],
+                      "0_500": values["0_500"],
                       user_id: user?.id,
                     },
                   });
@@ -88,21 +100,26 @@ export const CarDialog: FC<CarDialogProps> = ({ carId, handleClose }) => {
               }}
               render={({ handleSubmit, submitErrors, submitting }) => (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  <TextField
-                    field="name"
-                    label="Name"
-                    placeholder="e.g Bugatti Chiron"
-                    required
-                  />
-                  <SelectField
-                    field="class"
-                    label="Class"
-                    data={[
-                      { label: "Road", value: "road" },
-                      { label: "Supercar", value: "supercar" },
-                      { label: "Hypercar", value: "hypercar" },
-                    ]}
-                  />
+                  <Tabs defaultValue="details" className="">
+                    <TabsList>
+                      <TabsTrigger
+                        value="details"
+                        className="flex flex-row gap-2"
+                      >
+                        <CarIcon className="w-3 h-3" />
+                        Details
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="specifications"
+                        className="flex flex-row gap-2"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        Specifications
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabDetails />
+                    <TabSpecifications />
+                  </Tabs>
                   {submitErrors && (
                     <div className="text-red-600 text-sm w-full">
                       {submitErrors.body}
@@ -118,7 +135,10 @@ export const CarDialog: FC<CarDialogProps> = ({ carId, handleClose }) => {
                       {submitting ? (
                         <LoadingSpinner size="xs" isButton />
                       ) : (
-                        "Save"
+                        <>
+                          <SaveIcon />
+                          Save
+                        </>
                       )}
                     </Button>
                     {carId && (
@@ -129,6 +149,7 @@ export const CarDialog: FC<CarDialogProps> = ({ carId, handleClose }) => {
                         onClick={handleRemoveCar}
                         className="flex w-full justify-center bg-transparent hover:bg-red-200 border border-red-200 text-red-600"
                       >
+                        <Trash />
                         Delete
                       </Button>
                     )}

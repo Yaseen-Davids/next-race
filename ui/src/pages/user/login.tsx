@@ -88,7 +88,7 @@ export const Login: FC<Props> = () => {
                 </form>
               )}
             />
-            <div>
+            {/* <div>
               <div className="relative mt-8">
                 <div
                   aria-hidden="true"
@@ -102,9 +102,9 @@ export const Login: FC<Props> = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
-          <div className="mt-6 mb-6">
+          {/* <div className="mt-6 mb-6">
             <p className="text-center text-sm/6 text-gray-700">
               Not a member?{" "}
               <button
@@ -115,7 +115,7 @@ export const Login: FC<Props> = () => {
                 Sign up
               </button>
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

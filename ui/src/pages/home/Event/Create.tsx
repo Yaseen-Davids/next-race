@@ -208,21 +208,19 @@ type FormDetailProps = {
 
 const FormDetail: FC<FormDetailProps> = ({ cars, loadingCars }) => {
   return (
-    <>
-      <Tabs defaultValue="event" className="">
-        <TabsList>
-          <TabsTrigger value="event" className="flex flex-row gap-2">
-            <Calendar className="w-3 h-3" />
-            Event
-          </TabsTrigger>
-          <TabsTrigger value="youtube" className="flex flex-row gap-2">
-            <Pencil className="w-3 h-3" />
-            Youtube
-          </TabsTrigger>
-        </TabsList>
-        <TabEvent cars={cars} loadingCars={loadingCars} />
-        <TabYoutube />
-      </Tabs>
-    </>
+    <Tabs defaultValue="event" className="">
+      <TabsList>
+        <TabsTrigger value="event" className="flex flex-row gap-2">
+          <Calendar className="w-3 h-3" />
+          Event
+        </TabsTrigger>
+        <TabsTrigger value="youtube" className="flex flex-row gap-2">
+          <Pencil className="w-3 h-3" />
+          Youtube
+        </TabsTrigger>
+      </TabsList>
+      <TabEvent cars={cars} loadingCars={loadingCars} />
+      <TabYoutube />
+    </Tabs>
   );
 };

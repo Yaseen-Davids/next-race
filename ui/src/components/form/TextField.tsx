@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Field } from "react-final-form";
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
@@ -18,6 +18,7 @@ type TextFieldProps = {
   placeholder?: string;
   inputStyle?: string;
   rows?: number;
+  autoFocus?: boolean;
 };
 
 export const TextField: FC<TextFieldProps> = ({
@@ -30,8 +31,17 @@ export const TextField: FC<TextFieldProps> = ({
   multiline = false,
   inputStyle = "",
   rows = 3,
+  autoFocus,
 }) => {
   const [showPassword, toggleShowPassword] = useState(false);
+
+  const ref = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (autoFocus && ref.current) {
+      ref.current.focus();
+    }
+  }, [ref.current, autoFocus]);
 
   return (
     <div>
@@ -50,6 +60,7 @@ export const TextField: FC<TextFieldProps> = ({
             multiline ? (
               <div className="w-full">
                 <Textarea
+                  ref={ref as React.Ref<HTMLTextAreaElement>}
                   rows={rows}
                   disabled={disabled}
                   onChange={input.onChange}
@@ -66,6 +77,7 @@ export const TextField: FC<TextFieldProps> = ({
             ) : (
               <div className="relative">
                 <Input
+                  ref={ref as React.Ref<HTMLInputElement>}
                   type={input.type}
                   disabled={disabled}
                   onChange={input.onChange}
