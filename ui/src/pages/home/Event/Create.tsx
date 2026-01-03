@@ -10,7 +10,6 @@ import {
   useEventsWithCars,
   useNextEvents,
 } from "@/lib/api/events";
-import { useCarsApi } from "@/lib/api/cars";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -44,18 +43,6 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
 
   const { data: eventData, isFetching: fetchingEvent } = useEventsWithCars(
     eventId!
-  );
-  const { data, isFetching } = useCarsApi.useAll();
-
-  const allCars = useMemo(
-    () =>
-      (data || [])
-        .map((d) => ({
-          value: d.id,
-          label: d.name,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [data]
   );
 
   const event = useMemo(() => {
@@ -146,7 +133,7 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
               }}
               render={({ handleSubmit, submitErrors, submitting }) => (
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <FormDetail cars={allCars} loadingCars={isFetching} />
+                  <FormDetail />
                   {submitErrors && (
                     <div className="text-red-600 text-sm w-full">
                       {submitErrors.body}
@@ -201,12 +188,9 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
   );
 };
 
-type FormDetailProps = {
-  loadingCars: boolean;
-  cars: { label: string; value: string }[];
-};
+type FormDetailProps = {};
 
-const FormDetail: FC<FormDetailProps> = ({ cars, loadingCars }) => {
+const FormDetail: FC<FormDetailProps> = ({}) => {
   return (
     <Tabs defaultValue="event" className="">
       <TabsList>
@@ -219,7 +203,7 @@ const FormDetail: FC<FormDetailProps> = ({ cars, loadingCars }) => {
           Youtube
         </TabsTrigger>
       </TabsList>
-      <TabEvent cars={cars} loadingCars={loadingCars} />
+      <TabEvent />
       <TabYoutube />
     </Tabs>
   );

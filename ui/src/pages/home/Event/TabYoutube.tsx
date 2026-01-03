@@ -1,6 +1,7 @@
 import { TextField } from "@/components/form/TextField";
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { useCarsApi } from "@/lib/api/cars";
 import { useMemo } from "react";
 import { useFormState } from "react-final-form";
 
@@ -21,6 +22,8 @@ const useHashTag = (name: string) =>
   `#${(name ?? "").toLowerCase().replace(/[\s]/g, "")}`;
 
 const VideoDetails = () => {
+  const { data: carsData, isFetching: fetchingCars } = useCarsApi.useAll();
+
   const state = useFormState();
 
   const title = useMemo(() => {
@@ -50,6 +53,52 @@ const VideoDetails = () => {
       .join(" ");
   }, [state.values]);
 
+  const speed = useMemo(() => {
+    if (fetchingCars) return [];
+
+    const { car1, car2, car3 } = state.values;
+
+    return [car1, car2, car3].reduce((arr, acc) => {
+      if (!acc || !acc.value) return arr;
+
+      const spec = carsData?.find((carD) => carD.id === acc.value);
+      if (spec) {
+        arr.push([
+          spec["name"],
+          spec["0_100"],
+          spec["0_200"],
+          spec["0_300"],
+          spec["0_350"],
+          spec["0_400"],
+        ]);
+      }
+      return arr;
+    }, []);
+  }, [state.values, fetchingCars, carsData]);
+
+  const specs = useMemo(() => {
+    if (fetchingCars) return [];
+
+    const { car1, car2, car3 } = state.values;
+
+    return [car1, car2, car3].reduce((arr, acc) => {
+      if (!acc || !acc.value) return arr;
+
+      const spec = carsData?.find((carD) => carD.id === acc.value);
+      if (spec) {
+        arr.push(
+          [
+            spec["name"],
+            `${spec["hp"]} Hp`,
+            `${spec["nm"]} Nm`,
+            `${spec["kg"]} Kg`,
+          ].join("\n")
+        );
+      }
+      return arr;
+    }, []);
+  }, [state.values, fetchingCars, carsData]);
+
   return (
     <>
       <div>
@@ -57,17 +106,10 @@ const VideoDetails = () => {
           <label className="block text-sm/6 font-medium text-gray-900">
             Title
           </label>
-          {/* <Button
-            type="button"
-            variant="ghost"
-            className="p-0 h-5 w-10 px-2 py-1"
-          >
-            <CopyIcon />
-          </Button> */}
         </div>
         <div className="mt-1">
           <Textarea
-            rows={3}
+            rows={1}
             defaultValue={title}
             placeholder="Select cars to use this title"
             className="w-full placeholder:text-sm"
@@ -79,18 +121,41 @@ const VideoDetails = () => {
           <label className="block text-sm/6 font-medium text-gray-900">
             Description
           </label>
-          {/* <Button
-            type="button"
-            variant="ghost"
-            className="p-0 h-5 w-10 px-2 py-1"
-          >
-            <CopyIcon />
-          </Button> */}
+        </div>
+        <div className="mt-1">
+          <Textarea
+            rows={1}
+            defaultValue={description}
+            placeholder="Select cars to use this description"
+            className="w-full placeholder:text-sm"
+          />
+        </div>
+      </div>
+      <div>
+        <div className="flex flex-row gap-2 items-center">
+          <label className="block text-sm/6 font-medium text-gray-900">
+            Speed
+          </label>
         </div>
         <div className="mt-1">
           <Textarea
             rows={3}
-            defaultValue={description}
+            defaultValue={JSON.stringify(speed)}
+            placeholder="Select cars to use this description"
+            className="w-full placeholder:text-sm"
+          />
+        </div>
+      </div>
+      <div>
+        <div className="flex flex-row gap-2 items-center">
+          <label className="block text-sm/6 font-medium text-gray-900">
+            Specs
+          </label>
+        </div>
+        <div className="mt-1">
+          <Textarea
+            rows={3}
+            defaultValue={specs.join("\n")}
             placeholder="Select cars to use this description"
             className="w-full placeholder:text-sm"
           />
