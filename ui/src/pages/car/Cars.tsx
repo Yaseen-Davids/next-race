@@ -71,7 +71,7 @@ export const Cars: FC<Props> = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 sm:flex-row flex-wrap">
+      <div className="flex flex-col gap-4 sm:flex-row flex-wrap">
         {filtered
           ?.sort((a, b) => a.name.localeCompare(b.name))
           .map((car) => (
@@ -81,12 +81,51 @@ export const Cars: FC<Props> = () => {
               className="w-full sm:w-[300px] cursor-pointer"
             >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-bold">{car.name}</CardTitle>
+                <CardTitle className="text-base font-bold">
+                  {car.name}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500 font-bold">
                   {car.hp ?? "-"}hp | {car.nm ?? "-"}nm | {car.kg ?? "-"}kg
                 </p>
+                <div className="text-sm text-gray-500 grid grid-cols-5 mt-2">
+                  <p className="grid grid-rows-2 text-center border divide-y border-gray-200">
+                    <span className="text-gray-400">0-100</span>
+                    <span className="text-gray-600 font-bold">
+                      {car["0_100"] ?? "-"}
+                      {car["0_100"] ? "s" : ""}
+                    </span>
+                  </p>
+                  <p className="grid grid-rows-2 text-center border divide-y border-gray-200">
+                    <span className="text-gray-400">0-200</span>
+                    <span className="text-gray-600 font-bold">
+                      {car["0_200"] ?? "-"}
+                      {car["0_200"] ? "s" : ""}
+                    </span>
+                  </p>
+                  <p className="grid grid-rows-2 text-center border divide-y border-gray-200">
+                    <span className="text-gray-400">0-300</span>
+                    <span className="text-gray-600 font-bold">
+                      {car["0_300"] ?? "-"}
+                      {car["0_300"] ? "s" : ""}
+                    </span>
+                  </p>
+                  <p className="grid grid-rows-2 text-center border divide-y border-gray-200">
+                    <span className="text-gray-400">0-350</span>
+                    <span className="text-gray-600 font-bold">
+                      {car["0_350"] ?? "-"}
+                      {car["0_350"] ? "s" : ""}
+                    </span>
+                  </p>
+                  <p className="grid grid-rows-2 text-center border divide-y border-gray-200">
+                    <span className="text-gray-400">0-400</span>
+                    <span className="text-gray-600 font-bold">
+                      {car["0_400"] ?? "-"}
+                      {car["0_400"] ? "s" : ""}
+                    </span>
+                  </p>
+                </div>
               </CardContent>
             </Card>
           ))}
