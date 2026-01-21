@@ -76,7 +76,7 @@ const VideoDetails = () => {
     }, []);
   }, [state.values, fetchingCars, carsData]);
 
-  const specs = useMemo(() => {
+  const specsList: Array<{ name: string; text: string }> = useMemo(() => {
     if (fetchingCars) return [];
 
     const { car1, car2, car3 } = state.values;
@@ -86,14 +86,15 @@ const VideoDetails = () => {
 
       const spec = carsData?.find((carD) => carD.id === acc.value);
       if (spec) {
-        arr.push(
-          [
+        arr.push({
+          name: spec.name,
+          text: [
             spec["name"],
-            `${spec["hp"]} Hp`,
-            `${spec["nm"]} Nm`,
-            `${spec["kg"]} Kg`,
-          ].join("\n")
-        );
+            `${spec["hp"] ?? "-"} Hp`,
+            `${spec["nm"] ?? "-"} Nm`,
+            `${spec["kg"] ?? "-"} Kg`,
+          ].join("\n"),
+        });
       }
       return arr;
     }, []);
@@ -152,13 +153,27 @@ const VideoDetails = () => {
             Specs
           </label>
         </div>
-        <div className="mt-1">
-          <Textarea
-            rows={3}
-            defaultValue={specs.join("\n")}
-            placeholder="Select cars to use this description"
-            className="w-full placeholder:text-sm"
-          />
+        <div className="grid grid-cols-2 gap-4">
+          {specsList.length === 0 && (
+            <Textarea
+              rows={3}
+              defaultValue={""}
+              placeholder="Select cars to use this description"
+              className="w-full placeholder:text-sm"
+            />
+          )}
+          {specsList.map((s, idx) => (
+            <div key={`spec-${idx}`} className="flex gap-2 items-start">
+              <div className="flex-1">
+                <Textarea
+                  rows={4}
+                  defaultValue={s.text}
+                  placeholder={`Specs for ${s.name}`}
+                  className="w-full placeholder:text-sm"
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </>
