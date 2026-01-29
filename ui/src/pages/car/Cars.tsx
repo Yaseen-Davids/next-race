@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CarDialog } from "./CarDialog";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
 
 type Props = {};
 
@@ -31,7 +32,7 @@ export const Cars: FC<Props> = () => {
           value !== undefined &&
           String(value).toLowerCase().includes(lower)
         );
-      })
+      }),
     );
   }, [search, cars]);
 
@@ -62,12 +63,18 @@ export const Cars: FC<Props> = () => {
           >
             Add a new car
           </Button>
-          <div>
+          <div className="relative">
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
             />
+            {search && search !== "" && (
+              <XMarkIcon
+                className="absolute right-3 top-2.5 w-4 h-4 text-gray-400 cursor-pointer"
+                onClick={() => setSearch("")}
+              />
+            )}
           </div>
         </div>
       </div>

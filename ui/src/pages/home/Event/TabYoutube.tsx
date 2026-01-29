@@ -22,32 +22,30 @@ const useHashTag = (name: string) =>
   `#${(name ?? "").toLowerCase().replace(/[\s]/g, "")}`;
 
 const VideoDetails = () => {
-  const { data: carsData, isFetching: fetchingCars } = useCarsApi.useAll();
-
   const state = useFormState();
 
+  const { data: carsData, isFetching: fetchingCars } = useCarsApi.useAll();
+
+  const usedCars = useMemo(() => {
+    return Object.keys(state.values)
+      .filter((k) => k.includes("car"))
+      .map((k) => state.values[k]);
+  }, [state.values]);
+
   const title = useMemo(() => {
-    return new Array(3)
-      .fill(1)
-      .reduce((acc, _, i) => {
-        const car = state.values[`car${i + 1}`];
-        if (car) {
-          const hasNext = state.values[`car${i + 2}`];
-          acc.push(`${car.label} ${hasNext ? "vs" : "DRAG RACE"}`);
-        }
+    return usedCars
+      .reduce((acc, car, i, arr) => {
+        const hasNext = arr[i + 1];
+        acc.push(`${car.label} ${hasNext ? "vs" : "DRAG RACE"}`);
         return acc;
       }, [])
       .join(" ");
-  }, [state.values]);
+  }, [usedCars]);
 
   const description = useMemo(() => {
-    return new Array(3)
-      .fill(1)
-      .reduce((acc, _, i) => {
-        const car = state.values[`car${i + 1}`];
-        if (car) {
-          acc.push(useHashTag(car.label));
-        }
+    return usedCars
+      .reduce((acc, car) => {
+        acc.push(useHashTag(car.label));
         return acc;
       }, [])
       .join(" ");
@@ -56,12 +54,10 @@ const VideoDetails = () => {
   const speed = useMemo(() => {
     if (fetchingCars) return [];
 
-    const { car1, car2, car3 } = state.values;
+    return usedCars.reduce((arr, car) => {
+      if (!car || !car.value) return arr;
 
-    return [car1, car2, car3].reduce((arr, acc) => {
-      if (!acc || !acc.value) return arr;
-
-      const spec = carsData?.find((carD) => carD.id === acc.value);
+      const spec = carsData?.find((carD) => carD.id === car.value);
       if (spec) {
         arr.push([
           spec["name"],
@@ -74,17 +70,15 @@ const VideoDetails = () => {
       }
       return arr;
     }, []);
-  }, [state.values, fetchingCars, carsData]);
+  }, [usedCars, fetchingCars, carsData]);
 
   const specsList: Array<{ name: string; text: string }> = useMemo(() => {
     if (fetchingCars) return [];
 
-    const { car1, car2, car3 } = state.values;
+    return usedCars.reduce((arr, car) => {
+      if (!car || !car.value) return arr;
 
-    return [car1, car2, car3].reduce((arr, acc) => {
-      if (!acc || !acc.value) return arr;
-
-      const spec = carsData?.find((carD) => carD.id === acc.value);
+      const spec = carsData?.find((carD) => carD.id === car.value);
       if (spec) {
         arr.push({
           name: spec.name,

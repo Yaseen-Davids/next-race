@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { UserContext } from "@/contexts/UserContext";
 import {
+  EventCar,
   useEventsApi,
   useEventsWithCars,
   useNextEvents,
@@ -23,6 +24,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, CopyIcon, Pencil, SaveIcon, Trash } from "lucide-react";
 import { TabEvent } from "./TabEvent";
 import { TabYoutube } from "./TabYoutube";
+
+const carsToObj = (cars: EventCar[]) =>
+  Object.fromEntries(cars.map((car, index) => [`car${index + 1}`, car])) as {
+    [key: string]: EventCar;
+  };
 
 type CreateEventDialogProps = {
   eventId: string | undefined;
@@ -42,14 +48,14 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
   const { mutateAsync: removeEvent } = useEventsApi.useRemove();
 
   const { data: eventData, isFetching: fetchingEvent } = useEventsWithCars(
-    eventId!
+    eventId!,
   );
 
   const event = useMemo(() => {
     if (fetchingEvent || !eventId) return undefined;
     const { cars, ...rest } = eventData![0];
-    const [car1, car2, car3] = cars;
-    return { ...rest, car1, car2, car3 };
+    const carsObj = carsToObj(cars);
+    return { ...rest, ...carsObj };
   }, [fetchingEvent, eventData, eventId]);
 
   const handleRemoveEvent = async (eventId: string) => {
@@ -117,12 +123,27 @@ export const CreateEventDialog: FC<CreateEventDialogProps> = ({
               }
               onSubmit={async (values) => {
                 try {
-                  const { car1, car2, car3, ...rest } = values;
+                  // collect all carN keys dynamically (car1, car2, ...) and preserve order
+                  const cars = Object.keys(values)
+                    // only keys in the form car<number>
+                    .filter((k) => /^car\d+$/.test(k))
+                    .sort((a, b) => {
+                      const na = Number(a.match(/\d+$/)![0]);
+                      const nb = Number(b.match(/\d+$/)![0]);
+                      return na - nb;
+                    })
+                    .map((k) => (values as any)[k]?.value)
+                    .filter(Boolean);
+
+                  const rest = Object.fromEntries(
+                    Object.entries(values).filter(([k]) => !/^car\d+$/.test(k)),
+                  );
+
                   await upsertEvent({
                     ...rest,
                     date: format(values.date, "yyyy-MM-dd"),
                     user_id: user?.id,
-                    cars: [car1.value, car2.value, car3.value].filter(Boolean),
+                    cars,
                   });
                   queryClient.invalidateQueries({ queryKey: ["events"] });
                   toast.success(`Event ${eventId ? "updated" : "created"}!`);

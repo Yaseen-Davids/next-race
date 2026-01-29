@@ -19,6 +19,11 @@ interface EventsByUser {
   event_type: string;
 }
 
+export interface EventCar {
+  value: string;
+  label: string;
+}
+
 interface EventsWithCars extends Event {
   cars: { value: string; label: string }[];
 }
