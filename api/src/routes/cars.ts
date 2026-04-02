@@ -29,28 +29,32 @@ router.get(
 
       const data = await query.raw(
         `
-        WITH raced_cars AS (
-          SELECT DISTINCT r2.car_id
-          FROM races r1
-          JOIN races r2 ON r1.event_id = r2.event_id
-          WHERE r1.car_id = :car_id
-            AND r2.car_id != :car_id
+        WITH car_events AS (
+          SELECT event_id
+          FROM races
+          WHERE car_id = :car_id
         )
 
-        SELECT c.id, c.name
+        SELECT c.id, c.name, c.class, c.hp, c.nm, c.kg, 
+               c."0_100", c."0_200", c."0_250", c."0_300", 
+               c."0_350", c."0_400", c."0_500"
         FROM cars c
-        WHERE c.id != :car_id
-          AND c.id NOT IN (SELECT car_id FROM raced_cars)
-        order by c.name;
+        WHERE c.id NOT IN (
+          SELECT r.car_id
+          FROM races r
+          JOIN car_events ce ON r.event_id = ce.event_id
+          WHERE r.car_id != :car_id
+        )
+        ORDER BY c.name;
         `,
-        { car_id }
+        { car_id },
       );
 
       return res.json(data.rows);
     } catch (error) {
       return next(error);
     }
-  }
+  },
 );
 
 export default router;

@@ -46,8 +46,6 @@ export const TabEvent: FC<Props> = ({}) => {
       );
   }, [state.values]);
 
-  console.log("🚀 ~ TabEvent ~ state.values:", state.values);
-
   const handleAddCarToForm = () => {
     const keys = usedCarKeys;
     const nextIndex =

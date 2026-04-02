@@ -44,7 +44,7 @@ export const DateField: FC<DateFieldProps> = ({
                     variant={"outline"}
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !input.value && "text-muted-foreground"
+                      !input.value && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon />

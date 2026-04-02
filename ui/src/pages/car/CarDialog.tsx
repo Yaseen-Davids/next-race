@@ -15,9 +15,10 @@ import { Form } from "react-final-form";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Car as CarIcon, Pencil, SaveIcon, Trash } from "lucide-react";
+import { Car as CarIcon, Pencil, SaveIcon, Trash, Trophy } from "lucide-react";
 import { TabDetails } from "./Car/TabDetails";
 import { TabSpecifications } from "./Car/TabSpecifications";
+import { TabAvailableRaces } from "./Car/TabAvailableRaces";
 
 type CarDialogProps = {
   carId?: string;
@@ -116,9 +117,17 @@ export const CarDialog: FC<CarDialogProps> = ({ carId, handleClose }) => {
                         <Pencil className="w-3 h-3" />
                         Specifications
                       </TabsTrigger>
+                      <TabsTrigger
+                        value="available-races"
+                        className="flex flex-row gap-2"
+                      >
+                        <Trophy className="w-3 h-3" />
+                        Available races
+                      </TabsTrigger>
                     </TabsList>
                     <TabDetails />
                     <TabSpecifications />
+                    <TabAvailableRaces carId={carId} currentCar={data} />
                   </Tabs>
                   {submitErrors && (
                     <div className="text-red-600 text-sm w-full">

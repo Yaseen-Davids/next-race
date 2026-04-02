@@ -25,7 +25,7 @@ export const useCarsApi = createWriteableHooks<Car>({
 });
 
 export const useCarsToRace = (primaryCarID: string) =>
-  useApiGet<{ id: string; name: string }[]>({
+  useApiGet<Car[]>({
     endpoint: `/cars/carsToRace/${primaryCarID}`,
     queryKey: "cars",
   });
